@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="scroll-smooth dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>個人簡介 | 橫跨硬軟體的技術工作者</title>
+    <!-- 引入 Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入 FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- 引入 Google Fonts (Inter & Noto Sans TC) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class', // 啟用基於 class 的暗黑模式
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'Noto Sans TC', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: '#1e3a8a',
+                        secondary: '#3b82f6',
+                        accent: '#10b981',
+                        dark: '#111827',
+                        light: '#f3f4f6',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* 避免深色模式載入時的閃爍 (FOUC) */
+        html { transition: background-color 0.3s ease, color 0.3s ease; }
+        
+        /* 動畫效果 */
+        .fade-in-up {
+            animation: fadeInUp 0.8s ease-out forwards;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        
+        .delay-100 { animation-delay: 100ms; }
+        .delay-200 { animation-delay: 200ms; }
+        .delay-300 { animation-delay: 300ms; }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* 技能卡片 hover 效果 */
+        .skill-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .skill-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* 毛玻璃效果 (相容深淺色) */
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        html.dark .glass-nav {
+            background: rgba(17, 24, 39, 0.85);
+        }
+        
+        /* 隱藏原生捲軸但保持可滾動 (選擇性美化) */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        html.dark ::-webkit-scrollbar-thumb {
+            background: #475569;
+        }
+    </style>
+
+    <script>
+        // 在畫面渲染前先檢查主題，預設為深色模式，並防止載入閃爍
+        if (localStorage.getItem('color-theme') === 'light') {
+            document.documentElement.classList.remove('dark');
+        } else {
+            document.documentElement.classList.add('dark');
+        }
+    </script>
+</head>
+<body class="bg-gray-50 text-gray-800 dark:bg-gray-900 dark:text-gray-200 font-sans antialiased selection:bg-primary selection:text-white transition-colors duration-300">
+
+    <nav class="fixed w-full z-50 glass-nav border-b border-gray-200 dark:border-gray-800 transition-all duration-300" id="navbar">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo -->
+                <div class="flex-shrink-0 flex items-center">
+                    <a href="#" class="text-xl font-bold text-primary dark:text-secondary tracking-wider hover:text-secondary dark:hover:text-blue-400 transition-colors">
+                        <i class="fa-solid fa-microchip mr-2"></i>TechProfile
+                    </a>
+                </div>
+                
+                <!-- 桌面版選單 -->
+                <div class="hidden md:flex space-x-8">
+                    <a href="#about" class="text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-secondary px-3 py-2 text-sm font-medium transition-colors">關於我</a>
+                    <a href="#experience" class="text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-secondary px-3 py-2 text-sm font-medium transition-colors">職責與貢獻</a>
+                    <a href="#skills" class="text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-secondary px-3 py-2 text-sm font-medium transition-colors">專業技能</a>
+                </div>
+                
+                <!-- 手機版漢堡選單按鈕 -->
+                <div class="md:hidden flex items-center">
+                    <button id="mobile-menu-btn" class="text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-white focus:outline-none p-2">
+                        <i class="fa-solid fa-bars text-2xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 手機版下拉選單 -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white dark:bg-gray-800 border-t border-gray-100 dark:border-gray-700 shadow-lg absolute w-full transition-colors duration-300">
+            <div class="px-4 pt-2 pb-4 space-y-1 sm:px-3">
+                <a href="#about" class="mobile-link block px-3 py-2 text-base font-medium text-gray-700 dark:text-gray-200 hover:text-primary dark:hover:text-secondary hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md">關於我</a>
+                <a href="#experience" class="mobile-link block px-3 py-2 text-base font-medium text-gray-700 dark:text-gray-200 hover:text-primary dark:hover:text-secondary hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md">職責與貢獻</a>
+                <a href="#skills" class="mobile-link block px-3 py-2 text-base font-medium text-gray-700 dark:text-gray-200 hover:text-primary dark:hover:text-secondary hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md">專業技能</a>
+            </div>
+        </div>
+    </nav>
+
+    <section id="about" class="pt-28 pb-16 md:pt-36 md:pb-24 lg:pt-40 lg:pb-28 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 overflow-hidden relative transition-colors duration-300">
+        <!-- 裝飾用背景圓圈 -->
+        <div class="absolute top-0 right-0 -mr-20 -mt-20 w-64 h-64 rounded-full bg-blue-100 dark:bg-blue-900/20 opacity-50 blur-3xl pointer-events-none"></div>
+        <div class="absolute bottom-0 left-0 -ml-20 -mb-20 w-80 h-80 rounded-full bg-green-100 dark:bg-green-900/20 opacity-50 blur-3xl pointer-events-none"></div>
+        
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="flex flex-col lg:grid lg:grid-cols-12 lg:gap-12 items-center">
+                
+                <!-- 視覺圖像/大頭照 -->
+                <div class="order-1 lg:order-2 relative sm:max-w-md sm:mx-auto lg:max-w-none lg:mx-0 lg:col-span-5 flex justify-center w-full fade-in-up delay-200">
+                    <div class="relative w-56 h-56 sm:w-72 sm:h-72 lg:w-96 lg:h-96 rounded-full p-2 bg-white dark:bg-gray-800 shadow-2xl border border-gray-100 dark:border-gray-700 transition-colors duration-300">
+                        <!-- 漸層光暈背景 -->
+                        <div class="absolute inset-0 bg-gradient-to-tr from-secondary to-accent rounded-full opacity-40 blur-xl -z-10 animate-pulse" style="animation-duration: 4s;"></div>
+                        
+                        <!-- 替換為實際的圖片連結 -->
+                        <a href="https://pin.it/2zsfwG5ca" target="_blank" title="點擊查看 Pinterest" class="block w-full h-full cursor-pointer relative z-10">
+                            <img src="https://i.pinimg.com/736x/48/ed/71/48ed71ed785c36f7c544b13b29838349.jpg" 
+                                 onerror="this.onerror=null; this.src='https://placehold.co/400x400/1e3a8a/ffffff?text=%E9%BB%9E%E6%93%8A%E6%9F%A5%E7%9C%8B%E7%85%A7%E7%89%87';" 
+                                 alt="個人大頭照" 
+                                 class="w-full h-full object-cover rounded-full border-4 border-white dark:border-gray-800 shadow-inner hover:opacity-80 transition-opacity">
+                        </a>
+                        
+                        <!-- 裝飾用小浮動徽章 -->
+                        <div class="absolute bottom-2 right-2 sm:bottom-4 sm:right-4 bg-white dark:bg-gray-800 p-2 sm:p-3 rounded-full shadow-lg border border-gray-100 dark:border-gray-700 animate-bounce pointer-events-none z-20" style="animation-duration: 3s;">
+                            <i class="fa-solid fa-code-branch text-primary dark:text-blue-400 text-lg sm:text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 文字內容 -->
+                <div class="order-2 lg:order-1 sm:text-center md:max-w-2xl md:mx-auto lg:col-span-7 lg:text-left fade-in-up mt-10 lg:mt-0">
+                    <div class="inline-block px-4 py-1.5 rounded-full bg-blue-100 dark:bg-blue-900/30 text-primary dark:text-blue-300 font-semibold text-sm mb-6 shadow-sm border border-blue-200 dark:border-blue-800/50 transition-colors duration-300">
+                        <i class="fa-solid fa-code-branch mr-2"></i>硬體 x 軟體 x 量化交易
+                    </div>
+                    <h1 class="text-4xl tracking-tight font-extrabold text-gray-900 dark:text-white sm:text-5xl md:text-6xl lg:text-5xl xl:text-6xl mb-6 transition-colors duration-300">
+                        <span class="block">橫跨硬軟體領域的</span>
+                        <span class="block text-primary dark:text-secondary mt-2">系統化技術工作者</span>
+                    </h1>
+                    <div class="mt-4 text-base text-gray-600 dark:text-gray-300 sm:mt-5 sm:text-lg lg:text-lg xl:text-xl leading-relaxed space-y-4 transition-colors duration-300">
+                        <p>
+                            擁有 <strong>3 年半半導體設備工程</strong>經驗與 <strong>1 年半軟體測試</strong>經驗。從設備安裝、PLC控制的現場實作，到系統整合測試、單元測試的軟體品保流程，累積了對「系統穩定性」與「流程嚴謹度」的高度敏感度。
+                        </p>
+                        <p>
+                            近期將觸角延伸至<strong>加密貨幣量化交易</strong>領域，透過自學程式與市場實務，逐步建立跨界能力。具備橫跨軟硬體的系統性思維、對流程穩定性與精準度的高度要求，以及自主學習與跨域轉型的實踐力。
+                        </p>
+                    </div>
+                    <div class="mt-10 sm:flex sm:justify-center lg:justify-start space-y-4 sm:space-y-0 sm:space-x-4">
+                        <div class="rounded-md shadow">
+                            <a href="#experience" class="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-lg text-white bg-primary hover:bg-blue-800 dark:bg-secondary dark:hover:bg-blue-600 transition-colors md:py-4 md:text-lg">
+                                了解我的經歷 <i class="fa-solid fa-arrow-down ml-2"></i>
+                            </a>
+                        </div>
+                        <div class="rounded-md">
+                            <a href="#skills" class="w-full flex items-center justify-center px-8 py-3 border-2 border-gray-300 dark:border-gray-600 text-base font-medium rounded-lg text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-400 dark:hover:border-gray-500 transition-all md:py-4 md:text-lg">
+                                專業技能 <i class="fa-solid fa-screwdriver-wrench ml-2"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="experience" class="py-20 bg-white dark:bg-gray-900 relative transition-colors duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 fade-in-up">
+                <h2 class="text-base text-primary dark:text-secondary font-semibold tracking-wide uppercase">Experience</h2>
+                <p class="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-gray-900 dark:text-white sm:text-4xl transition-colors">
+                    職責與貢獻
+                </p>
+                <div class="mt-4 max-w-2xl text-lg text-gray-500 dark:text-gray-400 mx-auto transition-colors">
+                    從硬體現場的高壓實作到軟體系統的嚴謹驗證，具備完整的專案落地經驗。
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-10 lg:gap-16">
+                
+                <!-- 半導體經歷 -->
+                <div class="bg-gray-50 dark:bg-gray-800 rounded-2xl p-8 shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-md transition-all fade-in-up delay-100 relative overflow-hidden group">
+                    <div class="absolute top-0 right-0 -mr-8 -mt-8 text-blue-100 dark:text-blue-900/30 opacity-50 group-hover:scale-110 transition-transform duration-500 pointer-events-none">
+                        <i class="fa-solid fa-gears text-9xl"></i>
+                    </div>
+                    <div class="relative z-10">
+                        <div class="flex items-center mb-6">
+                            <div class="w-12 h-12 rounded-full bg-primary dark:bg-blue-600 flex items-center justify-center text-white mr-4 shadow-lg">
+                                <i class="fa-solid fa-microchip"></i>
+                            </div>
+                            <h3 class="text-2xl font-bold text-gray-900 dark:text-white">半導體設備領域</h3>
+                        </div>
+                        <ul class="space-y-5 text-gray-600 dark:text-gray-300">
+                            <li class="flex items-start">
+                                <span class="flex-shrink-0 h-6 w-6 text-primary dark:text-blue-400 flex items-center justify-center mt-0.5"><i class="fa-solid fa-check-circle"></i></span>
+                                <span class="ml-3">獨立完成<strong>超過 300 台</strong>半導體設備安裝，具備高強度、高精準度的現場執行能力。</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="flex-shrink-0 h-6 w-6 text-primary dark:text-blue-400 flex items-center justify-center mt-0.5"><i class="fa-solid fa-check-circle"></i></span>
+                                <span class="ml-3">負責<strong>三菱 PLC</strong> 相關控制邏輯建置與調校，確保設備運作符合嚴格規範。</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="flex-shrink-0 h-6 w-6 text-primary dark:text-blue-400 flex items-center justify-center mt-0.5"><i class="fa-solid fa-check-circle"></i></span>
+                                <span class="ml-3">於外包廠商任職期間，負責處理複雜的現場突發狀況，確保工程進度與品質。</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- 軟體測試經歷 -->
+                <div class="bg-gray-50 dark:bg-gray-800 rounded-2xl p-8 shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-md transition-all fade-in-up delay-200 relative overflow-hidden group">
+                     <div class="absolute top-0 right-0 -mr-8 -mt-8 text-green-100 dark:text-green-900/30 opacity-50 group-hover:scale-110 transition-transform duration-500 pointer-events-none">
+                        <i class="fa-solid fa-laptop-code text-9xl"></i>
+                    </div>
+                    <div class="relative z-10">
+                        <div class="flex items-center mb-6">
+                            <div class="w-12 h-12 rounded-full bg-accent dark:bg-emerald-600 flex items-center justify-center text-white mr-4 shadow-lg">
+                                <i class="fa-solid fa-vial-circle-check"></i>
+                            </div>
+                            <h3 class="text-2xl font-bold text-gray-900 dark:text-white">軟體測試與品保</h3>
+                        </div>
+                        <ul class="space-y-5 text-gray-600 dark:text-gray-300">
+                            <li class="flex items-start">
+                                <span class="flex-shrink-0 h-6 w-6 text-accent dark:text-emerald-400 flex items-center justify-center mt-0.5"><i class="fa-solid fa-check-circle"></i></span>
+                                <span class="ml-3">主導系統整合測試（SIT）與單元測試，執行<strong>超過 20 場需求訪談</strong>，有效釐清規格落差。</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="flex-shrink-0 h-6 w-6 text-accent dark:text-emerald-400 flex items-center justify-center mt-0.5"><i class="fa-solid fa-check-circle"></i></span>
+                                <span class="ml-3">規劃與執行 UAT（使用者驗收測試）、教育訓練及<strong>資料庫資料轉移</strong>，具備系統上線完整經驗。</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="flex-shrink-0 h-6 w-6 text-accent dark:text-emerald-400 flex items-center justify-center mt-0.5"><i class="fa-solid fa-check-circle"></i></span>
+                                <span class="ml-3">撰寫完整測試文件與流程紀錄，確保系統交付品質與高度可追溯性。</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <section id="skills" class="py-20 bg-gray-50 dark:bg-gray-800/50 transition-colors duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 fade-in-up">
+                <h2 class="text-base text-primary dark:text-secondary font-semibold tracking-wide uppercase">Expertise</h2>
+                <p class="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-gray-900 dark:text-white sm:text-4xl transition-colors">
+                    專業技能
+                </p>
+                <p class="mt-4 max-w-2xl text-lg text-gray-500 dark:text-gray-400 mx-auto transition-colors">
+                    結合硬體控制、軟體驗證到金融數據分析的多元技術棧。
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- 技能卡片 1 -->
+                <div class="skill-card bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm flex flex-col items-center text-center fade-in-up delay-100 transition-colors duration-300">
+                    <div class="w-16 h-16 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center mb-4 transition-colors">
+                        <i class="fa-solid fa-network-wired text-2xl"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2 transition-colors">硬體與 PLC</h3>
+                    <p class="text-gray-600 dark:text-gray-400 text-sm flex-grow transition-colors">三菱系統邏輯建置與設備調校，具備紮實的現場機台控制與除錯能力。</p>
+                </div>
+
+                <!-- 技能卡片 2 -->
+                <div class="skill-card bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm flex flex-col items-center text-center fade-in-up delay-200 transition-colors duration-300">
+                    <div class="w-16 h-16 rounded-full bg-green-50 dark:bg-green-900/30 text-green-600 dark:text-green-400 flex items-center justify-center mb-4 transition-colors">
+                        <i class="fa-solid fa-list-check text-2xl"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2 transition-colors">軟體測試 (QA)</h3>
+                    <p class="text-gray-600 dark:text-gray-400 text-sm flex-grow transition-colors">系統整合測試 (SIT)、單元測試、使用者驗收 (UAT) 測試流程之設計與嚴謹執行。</p>
+                </div>
+
+                <!-- 技能卡片 3 -->
+                <div class="skill-card bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm flex flex-col items-center text-center fade-in-up delay-300 transition-colors duration-300">
+                    <div class="w-16 h-16 rounded-full bg-yellow-50 dark:bg-yellow-900/20 text-yellow-600 dark:text-yellow-500 flex items-center justify-center mb-4 transition-colors">
+                        <i class="fa-solid fa-database text-2xl"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2 transition-colors">資料庫與專案管理</h3>
+                    <p class="text-gray-600 dark:text-gray-400 text-sm flex-grow transition-colors">熟練 SQL 查詢與資料轉移；具備需求訪談、教育訓練及技術文件撰寫等跨部門溝通能力。</p>
+                </div>
+
+                <!-- 技能卡片 4 -->
+                <div class="skill-card bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm flex flex-col items-center text-center fade-in-up delay-300 transition-colors duration-300">
+                    <div class="w-16 h-16 rounded-full bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 flex items-center justify-center mb-4 transition-colors">
+                        <i class="fa-brands fa-bitcoin text-2xl"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2 transition-colors">量化交易開發</h3>
+                    <p class="text-gray-600 dark:text-gray-400 text-sm flex-grow transition-colors">CCXT API 串接、雙均線策略實作與績效評估，理解訂單簿機制及冷熱數據架構。</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-20 bg-gray-900 text-white relative overflow-hidden">
+        <div class="absolute opacity-10 top-0 left-0 w-full h-full pointer-events-none" style="background-image: radial-gradient(#3b82f6 1px, transparent 1px); background-size: 30px 30px;"></div>
+        
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="lg:flex lg:items-center lg:justify-between">
+                <div class="lg:w-1/2 pr-0 lg:pr-12 fade-in-up">
+                    <div class="inline-flex items-center px-3 py-1 rounded-full bg-gray-800 text-secondary text-sm font-semibold mb-4 border border-gray-700">
+                        <i class="fa-solid fa-rocket mr-2"></i> 自我進修與新興領域
+                    </div>
+                    <h2 class="text-3xl font-extrabold sm:text-4xl mb-6">
+                        加密貨幣與<span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-accent">量化交易實務</span>
+                    </h2>
+                    <p class="text-gray-300 text-lg mb-8 leading-relaxed">
+                        持續自我突破，將技術能力應用於金融市場。深入理解市場機制，並透過程式實作交易邏輯與數據分析。長期關注市場動態與業界領袖（如腦哥、加密大漂亮）觀點，緊貼產業脈動。
+                    </p>
+                    
+                    <div class="space-y-4">
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0 mt-1">
+                                <i class="fa-solid fa-code text-accent"></i>
+                            </div>
+                            <p class="ml-3 text-gray-300">使用 <strong>CCXT API</strong> 串接各大交易所，穩定抓取即時幣價與市場深度數據。</p>
+                        </div>
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0 mt-1">
+                                <i class="fa-solid fa-chart-pie text-accent"></i>
+                            </div>
+                            <p class="ml-3 text-gray-300">實作<strong>雙均線交易策略</strong>邏輯，能計算夏普指數 (Sharpe Ratio) 與最大回撤 (Max Drawdown)，嚴謹評估風險調整後報酬。</p>
+                        </div>
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0 mt-1">
+                                <i class="fa-solid fa-layer-group text-accent"></i>
+                            </div>
+                            <p class="ml-3 text-gray-300">理解交易所買賣掛單(Order Book)順序機制，具備<strong>熱數據(即時運算)與冷數據(歷史儲存)</strong>分離之系統架構概念。</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-12 lg:mt-0 lg:w-1/2 fade-in-up delay-200">
+                    <div class="bg-gray-800 rounded-xl p-6 border border-gray-700 shadow-2xl relative overflow-hidden group">
+                        <svg class="absolute inset-0 w-full h-full text-gray-700 opacity-30 group-hover:opacity-50 transition-opacity pointer-events-none" preserveAspectRatio="none" viewBox="0 0 100 100">
+                            <path d="M0,80 L10,70 L20,75 L30,50 L40,60 L50,30 L60,40 L70,10 L80,20 L90,5 L100,15" fill="none" stroke="currentColor" stroke-width="2" vector-effect="non-scaling-stroke" />
+                            <path d="M0,80 L10,70 L20,75 L30,50 L40,60 L50,30 L60,40 L70,10 L80,20 L90,5 L100,15 L100,100 L0,100 Z" fill="url(#grad)" opacity="0.2" />
+                            <defs>
+                                <linearGradient id="grad" x1="0%" y1="0%" x2="0%" y2="100%">
+                                    <stop offset="0%" style="stop-color:currentColor;stop-opacity:1" />
+                                    <stop offset="100%" style="stop-color:currentColor;stop-opacity:0" />
+                                </linearGradient>
+                            </defs>
+                        </svg>
+                        
+                        <div class="relative z-10 flex flex-col h-full justify-between min-h-[250px]">
+                            <div class="flex justify-between items-center mb-8">
+                                <div class="text-sm text-gray-400 font-mono">def strategy(data):</div>
+                                <div class="flex space-x-2">
+                                    <span class="w-3 h-3 rounded-full bg-red-500"></span>
+                                    <span class="w-3 h-3 rounded-full bg-yellow-500"></span>
+                                    <span class="w-3 h-3 rounded-full bg-green-500"></span>
+                                </div>
+                            </div>
+                            <div class="font-mono text-sm text-blue-300 mb-2">
+                                > CCXT API Connected...<br>
+                                > Fetching OHLCV data...<br>
+                                > Calculating Moving Averages...
+                            </div>
+                            <div class="bg-gray-900 rounded p-4 border border-gray-700 mt-auto">
+                                <div class="flex justify-between text-xs mb-2 text-gray-400">
+                                    <span>Metrics</span>
+                                    <span>Result</span>
+                                </div>
+                                <div class="flex justify-between items-center mb-1">
+                                    <span class="text-gray-300">Sharpe Ratio</span>
+                                    <span class="text-accent font-bold">1.85</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-300">Max Drawdown</span>
+                                    <span class="text-red-400 font-bold">-12.4%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="bg-gray-50 dark:bg-gray-950 py-12 border-t border-gray-200 dark:border-gray-800 transition-colors duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center">
+            <div class="flex items-center mb-4">
+                <i class="fa-solid fa-microchip text-primary dark:text-secondary text-2xl mr-2"></i>
+                <span class="text-xl font-bold text-gray-800 dark:text-gray-200 tracking-wider">TechProfile</span>
+            </div>
+            <p class="text-center text-gray-500 dark:text-gray-400 text-sm max-w-md mb-6">
+                結合橫跨軟硬體的系統性思維，追求流程的穩定性與精準度，具備高度自主學習與跨域轉型的實踐者。
+            </p>
+            <div class="flex space-x-4 mb-8">
+                <!-- LinkedIn 連結 -->
+                <a href="https://www.linkedin.com/in/楊-宗逸-085b36433" target="_blank" title="LinkedIn" class="w-10 h-10 rounded-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 flex items-center justify-center text-gray-600 dark:text-gray-400 hover:text-[#0a66c2] dark:hover:text-[#0a66c2] hover:border-[#0a66c2] dark:hover:border-[#0a66c2] transition-colors shadow-sm">
+                    <i class="fa-brands fa-linkedin-in"></i>
+                </a>
+                <!-- LINE 連結 -->
+                <a href="https://line.me/ti/p/0JquXLYc09" target="_blank" title="LINE" class="w-10 h-10 rounded-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 flex items-center justify-center text-gray-600 dark:text-gray-400 hover:text-[#06c755] dark:hover:text-[#06c755] hover:border-[#06c755] dark:hover:border-[#06c755] transition-colors shadow-sm text-lg">
+                    <i class="fa-brands fa-line"></i>
+                </a>
+                <!-- Email 預留 -->
+                <a href="#" class="w-10 h-10 rounded-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 flex items-center justify-center text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-secondary hover:border-primary dark:hover:border-secondary transition-colors shadow-sm" title="Contact">
+                    <i class="fa-solid fa-envelope"></i>
+                </a>
+            </div>
+            <p class="text-gray-400 dark:text-gray-600 text-xs">
+                &copy; 2026 TechProfile. All rights reserved.
+            </p>
+        </div>
+    </footer>
+
+    <!-- Floating Controls (Bottom Right) -->
+    <div class="fixed bottom-6 right-6 z-[60] flex flex-col space-y-3">
+        
+        <!-- Theme Toggle Button -->
+        <button id="theme-toggle" class="w-12 h-12 rounded-full bg-white dark:bg-gray-800 text-gray-800 dark:text-yellow-400 border border-gray-200 dark:border-gray-700 shadow-lg flex items-center justify-center hover:scale-110 transition-transform relative group focus:outline-none">
+            <i id="theme-toggle-dark-icon" class="fa-solid fa-moon text-xl hidden"></i>
+            <i id="theme-toggle-light-icon" class="fa-solid fa-sun text-xl hidden"></i>
+            <!-- Tooltip -->
+            <span class="absolute right-14 bg-gray-800 dark:bg-gray-700 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">切換深/淺色</span>
+        </button>
+
+        <!-- Music Toggle Button -->
+        <button id="music-toggle" class="w-12 h-12 rounded-full bg-primary dark:bg-secondary text-white shadow-lg flex items-center justify-center hover:scale-110 transition-transform relative group focus:outline-none">
+            <i id="music-icon" class="fa-solid fa-music text-xl"></i>
+            <!-- Tooltip -->
+            <span class="absolute right-14 bg-gray-800 dark:bg-gray-700 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none" id="music-tooltip">播放音樂</span>
+        </button>
+    </div>
+
+    <!-- 隱藏的音軌標籤 -->
+    <audio id="bg-music" loop>
+        <source src="https://img.ai365.fans/artworks/a8cab812-92b9-4628-8a5b-e970b7482e77/9wb1fn6wrka.mp3" type="audio/mpeg">
+        您的瀏覽器不支援音樂播放。
+    </audio>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- 1. 導覽列與選單邏輯 ---
+            const navbar = document.getElementById('navbar');
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 10) {
+                    navbar.classList.add('shadow-md');
+                } else {
+                    navbar.classList.remove('shadow-md');
+                }
+            });
+
+            const btn = document.getElementById('mobile-menu-btn');
+            const menu = document.getElementById('mobile-menu');
+            const mobileLinks = document.querySelectorAll('.mobile-link');
+
+            btn.addEventListener('click', () => {
+                menu.classList.toggle('hidden');
+                const icon = btn.querySelector('i');
+                if (menu.classList.contains('hidden')) {
+                    icon.classList.remove('fa-xmark');
+                    icon.classList.add('fa-bars');
+                } else {
+                    icon.classList.remove('fa-bars');
+                    icon.classList.add('fa-xmark');
+                }
+            });
+
+            mobileLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    menu.classList.add('hidden');
+                    const icon = btn.querySelector('i');
+                    icon.classList.remove('fa-xmark');
+                    icon.classList.add('fa-bars');
+                });
+            });
+
+            // --- 2. 進場動畫邏輯 (Intersection Observer) ---
+            const observerOptions = { root: null, rootMargin: '0px', threshold: 0.1 };
+            const observer = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.animationPlayState = 'running';
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, observerOptions);
+
+            document.querySelectorAll('.fade-in-up').forEach((el) => {
+                el.style.animationPlayState = 'paused';
+                observer.observe(el);
+            });
+            document.querySelectorAll('#about .fade-in-up').forEach((el) => {
+                el.style.animationPlayState = 'running';
+            });
+
+            // --- 3. 深淺色模式切換邏輯 ---
+            const themeToggleBtn = document.getElementById('theme-toggle');
+            const darkIcon = document.getElementById('theme-toggle-dark-icon');
+            const lightIcon = document.getElementById('theme-toggle-light-icon');
+
+            // 依據目前狀態顯示對應圖示
+            if (document.documentElement.classList.contains('dark')) {
+                lightIcon.classList.remove('hidden');
+            } else {
+                darkIcon.classList.remove('hidden');
+            }
+
+            themeToggleBtn.addEventListener('click', function() {
+                // 切換圖示
+                darkIcon.classList.toggle('hidden');
+                lightIcon.classList.toggle('hidden');
+
+                // 切換主題並存入 localStorage
+                if (document.documentElement.classList.contains('dark')) {
+                    document.documentElement.classList.remove('dark');
+                    localStorage.setItem('color-theme', 'light');
+                } else {
+                    document.documentElement.classList.add('dark');
+                    localStorage.setItem('color-theme', 'dark');
+                }
+            });
+
+            // --- 4. 背景音樂開關邏輯 ---
+            const musicBtn = document.getElementById('music-toggle');
+            const musicIcon = document.getElementById('music-icon');
+            const musicTooltip = document.getElementById('music-tooltip');
+            const bgMusic = document.getElementById('bg-music');
+            let isPlaying = false;
+
+            // 設定音樂音量 (可選，避免太大聲)
+            bgMusic.volume = 0.5;
+
+            musicBtn.addEventListener('click', () => {
+                if (isPlaying) {
+                    bgMusic.pause();
+                    musicIcon.classList.replace('fa-volume-high', 'fa-music');
+                    musicIcon.classList.remove('animate-pulse');
+                    musicTooltip.textContent = '播放音樂';
+                } else {
+                    // 嘗試播放音樂
+                    bgMusic.play().then(() => {
+                        musicIcon.classList.replace('fa-music', 'fa-volume-high');
+                        musicIcon.classList.add('animate-pulse');
+                        musicTooltip.textContent = '暫停音樂';
+                    }).catch(error => {
+                        console.error("Audio playback failed:", error);
+                        alert("瀏覽器可能阻擋了自動播放，請確認您的權限設定。");
+                    });
+                }
+                isPlaying = !isPlaying;
+            });
+        });
+    </script>
+</body>
+</html>
